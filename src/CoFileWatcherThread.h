@@ -62,17 +62,16 @@ public:
   CoFileWatcherThread();
   ~CoFileWatcherThread();
   void run();
-  void addPath ( const QString & path ); 
-  QString directory (); 
-  QString file (); 
+  void addPath ( const QString & path );
+  QString directory ();
+  QString file ();
 signals:
 
   // Qt take care of generating the implementation
-  void directoryChanged ( const QString & path ); 
-  void fileChanged ( const QString & path ); 
+  void directoryChanged ( const QString & path );
+  void fileChanged ( const QString & path );
 
 
-  
 };
 
 #endif

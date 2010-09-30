@@ -40,7 +40,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h> 
+#include <unistd.h>
 
 #include <qUtilities/QLetterCommands.h>
 #include "CoFileWatcher.h"
@@ -55,8 +55,8 @@ CoFileWatcher::CoFileWatcher(quint16 port, bool dm, string dir, bool vm, bool cp
   //fileWatcher = NULL;
   threadPool.clear();
   cout << dir << endl;
-  miString dirs(dir);
-  vector<miString> dirlist = dirs.split(",");
+  miutil::miString dirs(dir);
+  vector<miutil::miString> dirlist = dirs.split(",");
   for (int i = 0; i < dirlist.size(); i++)
   {
 	  CoFileWatcherThread * theThread = new CoFileWatcherThread();
@@ -72,7 +72,7 @@ CoFileWatcher::CoFileWatcher(quint16 port, bool dm, string dir, bool vm, bool cp
 
 #ifdef HAVE_LOG4CXX
   /// LOGGER
-  miString logpro;
+  miutil::miString logpro;
   if (logPropFile) {
     logpro = logPropFilename;
   }
@@ -89,11 +89,14 @@ CoFileWatcher::CoFileWatcher(quint16 port, bool dm, string dir, bool vm, bool cp
   logger = log4cxx::Logger::getLogger("coserver4.CoServer4");
 #endif
   cout << coserver_path.c_str() << endl;
-  coclient = new CoClient(NULL, "filewatcher", "localhost", coserver_path.c_str());
+
+  coclient = new CoClient("filewatcher", "localhost", coserver_path.c_str());
+  coclient->setBroadcastClient();
   coclient->connectToServer();
-  
-  console = new CoConsole();
+
   if (visualMode) {
+    cerr << "Visuable" << endl;
+    console = new CoConsole();
     console->show();
   }
   if (watchMode) {
@@ -134,7 +137,7 @@ CoFileWatcher::CoFileWatcher(quint16 port, bool dm, string dir, bool vm, bool cp
     LOG4CXX_ERROR(logger, "Failed to bind to port");
   }
 #endif
-  
+
   }
 
 CoFileWatcher::~CoFileWatcher()
@@ -149,8 +152,8 @@ CoFileWatcher::~CoFileWatcher()
 	  }
 	  if (visualMode) {
 		console->hide();
+		delete console;
 	  }
-	  delete console;
   }
 
 void CoFileWatcher::directoryHasChanged ( const QString & path )
@@ -168,21 +171,20 @@ void CoFileWatcher::directoryHasChanged ( const QString & path )
     letter.common = path.toStdString();
     letter.to = qmstrings::all;
 	coclient->sendMessage(letter);
-} 
-void CoFileWatcher::fileHasChanged ( const QString & path )
-{
-	if (visualMode)
-		console->log(path.toStdString());
-	else
-	{
-		cout << string(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss").toStdString()+"\n").c_str();
-		cout << string(path.toStdString() + "\n").c_str();
-	}
-	miMessage letter;
-    letter.command= qmstrings::file_changed;
-    letter.commondesc= "file changed";
-    letter.common = path.toStdString();
-    letter.to = qmstrings::all;
-	coclient->sendMessage(letter);
 }
 
+void CoFileWatcher::fileHasChanged ( const QString & path )
+{
+  if (visualMode)
+    console->log(path.toStdString());
+  else {
+    cout << string(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss").toStdString()+"\n").c_str();
+    cout << string(path.toStdString() + "\n").c_str();
+  }
+  miMessage letter;
+  letter.command= qmstrings::file_changed;
+  letter.commondesc= "file changed";
+  letter.common = path.toStdString();
+  letter.to = qmstrings::all;
+  coclient->sendMessage(letter);
+}

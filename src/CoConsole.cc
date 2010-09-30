@@ -38,15 +38,15 @@
 
 CoConsole::CoConsole() : QDialog() {
 	setWindowTitle("FileWatcher");
-	
+
 #ifdef HAVE_LOG4CXX
 	logger = log4cxx::Logger::getLogger("coserver4.CoConsole"); ///< LOG4CXX init
 #endif
-	
+
 	// set dialog layout
 	QVBoxLayout *layout = new QVBoxLayout;
 	setLayout(layout);
-	
+
 	QString info = QString("Log");
 	QLabel *infolabel = new QLabel( info, this );
 	infolabel->setAlignment(Qt::AlignCenter);

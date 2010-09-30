@@ -92,7 +92,7 @@ void CoFileWatcherThread::run()
 	time_t st_prev_mtime = time(NULL);
 	// init the file time
 	time_t st_prev_file_mtime = time(NULL);
-	
+
 	// init the watch_files time
 	time_t st_prev_wfile_mtime = time(NULL);
 
@@ -106,6 +106,7 @@ void CoFileWatcherThread::run()
 			if(!stat(_directory.toStdString().c_str(), &buf))
 			{
 				// > to deal with start up
+
 				if (buf.st_mtime > st_prev_mtime)
 				{
 					QString theDir(_directory);

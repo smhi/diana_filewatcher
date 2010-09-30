@@ -86,8 +86,8 @@ public:
   ~CoFileWatcher();
 
 public slots:
-	  void directoryHasChanged ( const QString & path ); 
-      void fileHasChanged ( const QString & path ); 
+  void directoryHasChanged ( const QString & path );
+  void fileHasChanged ( const QString & path );
 
 };
 
