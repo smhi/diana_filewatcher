@@ -17,9 +17,9 @@
 srcdir = .
 top_srcdir = ..
 
-pkgdatadir = $(datadir)/coserver4
-pkglibdir = $(libdir)/coserver4
-pkgincludedir = $(includedir)/coserver4
+pkgdatadir = $(datadir)/filewatcher
+pkglibdir = $(libdir)/filewatcher
+pkgincludedir = $(includedir)/filewatcher
 top_builddir = ..
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
 INSTALL = /usr/bin/install -c
@@ -136,11 +136,11 @@ LUPDATE4 = /usr/lib64/qt4/bin/lupdate
 MAKEINFO = ${SHELL} /data/proj/diana/NYVIS_DEV/Stefan.Fagerstrom/elon2_2/local/src/filewatcher/missing --run makeinfo
 MILOGGER_CPPFLAGS = -I/data/proj/diana/NYVIS_DEV/Stefan.Fagerstrom/elon2_2/local/include  
 MILOGGER_LDFLAGS = -L/data/proj/diana/NYVIS_DEV/Stefan.Fagerstrom/elon2_2/local/lib  
-MILOGGER_LIBS = -lmiLogger  
+MILOGGER_LIBS = -lmiLogger -llog4cpp  
 MILOGGER_VERSION = 3.3.0
 MOC4 = /usr/lib64/qt4/bin/moc
 OBJEXT = o
-PACKAGE = coserver4
+PACKAGE = filewatcher
 PACKAGE_BUGREPORT = 
 PACKAGE_NAME = 
 PACKAGE_STRING = 
@@ -159,7 +159,7 @@ QT4_LIBDIR = /usr/lib64/qt4/lib
 QT4_LIBS =  -L/usr/lib64/qt4/lib64 -lQtGui -L/usr/lib64/mysql -L/usr/lib64 -lpng -lSM -lICE -lXi -lXrender -lXrandr -lXcursor -lXinerama -lfreetype -lfontconfig -lXext -lX11 -lQtNetwork -lQtCore -lz -lm -ldl -lpthread
 QUTILITIES_CPPFLAGS = -g -pipe -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -fno-strict-aliasing -fwrapv -I/data/proj/diana/NYVIS_DEV/Stefan.Fagerstrom/elon2_2/local/include -I/usr/include/mysql  
 QUTILITIES_LDFLAGS = -L/data/proj/diana/NYVIS_DEV/Stefan.Fagerstrom/elon2_2/local/lib -L/usr/lib64/mysql  
-QUTILITIES_LIBS = -lqUtilities -lpuSQL -lmysqlclient_r -lz -lcrypt -lnsl -lm -lpthread -lssl -lcrypto -lmiLogger -lpuCtools -lpuTools  
+QUTILITIES_LIBS = -lqUtilities -lpuSQL -lmysqlclient_r -lz -lcrypt -lnsl -lm -lpthread -lssl -lcrypto -lmiLogger -llog4cpp -lpuCtools -lpuTools  
 QUTILITIES_VERSION = 3.3.0
 RANLIB = ranlib
 RCC4 = /usr/lib64/qt4/bin/rcc
@@ -168,7 +168,7 @@ SET_MAKE =
 SHELL = /bin/sh
 STRIP = strip
 UIC4 = /usr/lib64/qt4/bin/uic
-VERSION = 4.3.1
+VERSION = 1.0.1
 ac_ct_CC = gcc
 ac_ct_CXX = g++
 ac_ct_F77 = g77
