@@ -89,12 +89,14 @@ void CoFileWatcherThread::run()
 	// and make a thread of it
 	struct stat buf;
 	// init the dir time
-	time_t st_prev_mtime = time(NULL);
-	// init the file time
-	time_t st_prev_file_mtime = time(NULL);
-
+	time_t st_prev_mtime = 0;
+	// init the file (directory representing the file) time
+	time_t st_prev_file_mtime = 0;
 	// init the watch_files time
-	time_t st_prev_wfile_mtime = time(NULL);
+	time_t st_prev_wfile_mtime = 0;
+	// The QDateTime specifier
+	QString datetimespec = "";
+
 
 	while (!stop)
 	{
@@ -105,20 +107,34 @@ void CoFileWatcherThread::run()
 		{
 			if(!stat(_directory.toStdString().c_str(), &buf))
 			{
-				// > to deal with start up
-
+				// when start up, this will always bee true
 				if (buf.st_mtime > st_prev_mtime)
 				{
+					st_prev_mtime = buf.st_mtime;
 					QString theDir(_directory);
 					emit directoryChanged(theDir);
-					st_prev_mtime = buf.st_mtime;
-
 				}
 			}
 		}
 		if (_file != "")
 		{
 			// split _files in dir and pattern part
+			if (_file.contains("[") && _file.contains("]"))
+			{
+				// filespec contains a QDataTime specifier...
+				// get it, and replace with '*'.
+				QString left("[");
+				QString right("]");
+				int start = _file.indexOf(left);
+				int stop = _file.indexOf(right);
+				int len = stop - start;
+				//cerr << _file.toStdString().c_str() << endl;
+				datetimespec = _file.mid(start + 1, len - 1);
+				//cerr << datetimespec.toStdString().c_str() << endl;
+				QString str_to_replace = "[" + datetimespec + "]";
+				_file.replace(str_to_replace, QString("*"));
+				//cerr << _file.toStdString().c_str() << endl;
+			}
 			QFileInfo fi(_file);
 			QString basename = fi.completeBaseName();
 			QString suffix = fi.completeSuffix();
@@ -127,16 +143,15 @@ void CoFileWatcherThread::run()
 			//cout << cwd.toStdString().c_str() << endl;
 			if(!stat(cwd.toStdString().c_str(), &buf))
 			{
-				// > to deal with start up
+				// when start up, this will always bee true
 				// the directory representing file...
 				if (buf.st_mtime > st_prev_file_mtime)
 				{
-					QString theDir(cwd);
 					// send both dir changed and file changed...
 					// send dir changed
-					emit directoryChanged(theDir);
 					st_prev_file_mtime = buf.st_mtime;
-					sleep(1);
+					QString theDir(cwd);
+					emit directoryChanged(theDir);
 					// list the directory
 					// search for the youngest file
 					// here, we must check for creation time
@@ -145,108 +160,70 @@ void CoFileWatcherThread::run()
 					d.cd(cwd);
 					QStringList patterns(pattern);
 					QFileInfoList list = d.entryInfoList(patterns);
+					// directory not empty
 					if (list.size() > 0)
 					{
 						// only the youngest file is of interest
-						// HERE, we must check for creation time
+						// HERE, we must check for either creation time or time stamp, if present...
 						// NOTE: there can be other files with other extensions
 						// in the file system.
+						time_t prev_mtime = 0;
+						time_t mtime = 0;
+						int index = 0;
+						QDateTime qtimestamp;
+						QDateTime qmtime;
 						for (int k = 0; k < list.size(); k++)
 						{
 							QFileInfo fileInfo = list.at(k);
 							QString theFile = fileInfo.absoluteFilePath();
-							QDateTime qmtime(fileInfo.lastModified());
-							time_t mtime = qmtime.toTime_t();
-							// Note, the 'old' file can fullfill this
-							// so we must not break here
-							// and we must check that its a new file...
-							if (theFile != _watch_file)
+							// Get the timestamp from filename, if present
+							if (datetimespec != "")
 							{
-								if ((mtime >= st_prev_file_mtime) || (mtime >= st_prev_wfile_mtime))
-								{
-									_watch_file = theFile;
-									st_prev_wfile_mtime = mtime;
-									// send file changed...
-									emit fileChanged(theFile);
-								}
+								// Will always work, I think.
+								QString date_time = fileInfo.baseName();
+								//cout << date_time.toStdString().c_str() << endl; 
+								qtimestamp = QDateTime::fromString(date_time, datetimespec);
+								//cout << qtimestamp.toString().toStdString().c_str() << endl;
+								mtime = qtimestamp.toTime_t();
+							}
+							else
+							{
+								// More general, but perhaps not working
+								qmtime = fileInfo.created();
+								mtime = qmtime.toTime_t();
+							}
+							// Check for youngest file
+							if (mtime > prev_mtime)
+							{
+								prev_mtime = mtime;
+								index = k;
 							}
 						}
+						// This will point to the youngest file
+						st_prev_wfile_mtime = prev_mtime;
+						QFileInfo fileInfo = list.at(index);
+						QString theFile = fileInfo.absoluteFilePath();
+						_watch_file = theFile;
+						//cout << _watch_file.toStdString().c_str() << endl;
+						// send file changed...
+						emit fileChanged(theFile);
+
 					}
 				}
 				else
 				{
-					// stat the individual file
-					// if missing, list the directory...
-					// thats the case when starting up....
-					if (_watch_file == "")
-					{
-						// split _files in dir and pattern part
-						QFileInfo fi(_file);
-						QString basename = fi.completeBaseName();
-						QString suffix = fi.completeSuffix();
-						QString pattern = basename + "." + suffix;
-						QString cwd = fi.absolutePath();
-						QDir d;
-						d.setSorting(QDir::Time);
-						d.cd(cwd);
-						QStringList patterns(pattern);
-						QFileInfoList list = d.entryInfoList(patterns);
-						if (list.size()> 0)
-						{
-							// only the youngest file is of interest
-							// HERE, we must check for creation time
-							// NOTE: there can be other files with other extensions
-							// in the file system.
-							for (int k = 0; k < list.size(); k++)
-							{
-								QFileInfo fileInfo = list.at(k);
-								QString theFile = fileInfo.absoluteFilePath();
-								QDateTime qmtime(fileInfo.lastModified());
-								time_t mtime = qmtime.toTime_t();
-								// Note, the 'old' file can fullfill this
-								// so we must not break here
-								// and we must check that its a new file...
-								if (theFile != _watch_file)
-								{
-									if ((mtime >= buf.st_mtime) || (mtime >= st_prev_wfile_mtime))
-									{
-										_watch_file = theFile;
-										st_prev_wfile_mtime = mtime;
-										// send file changed...
-										emit fileChanged(theFile);
-									}
-								}
-							}
 
-							// only the youngest file is of interest
-							// NOTE: there can be other files with other extensions
-							// in the file system.
-							/*
-							QFileInfo fileInfo = list.at(0);
-							QString theFile = fileInfo.absoluteFilePath();
-							QDateTime qmtime(fileInfo.lastModified());
-							time_t mtime = qmtime.toTime_t();
-							_watch_file = theFile;
-							st_prev_wfile_mtime = mtime;
-							// send file changed...
+					if(!stat(_watch_file.toStdString().c_str(), &buf))
+					{
+						// > to deal with start up
+						if (buf.st_mtime > st_prev_wfile_mtime)
+						{
+							st_prev_wfile_mtime = buf.st_mtime;
+							QString theFile(_watch_file);
 							emit fileChanged(theFile);
-							*/
 						}
 					}
-					else
-					{
-						if(!stat(_watch_file.toStdString().c_str(), &buf))
-						{
-							// > to deal with start up
-							if (buf.st_mtime > st_prev_wfile_mtime)
-							{
-								QString theFile(_watch_file);
-								emit fileChanged(theFile);
-								st_prev_wfile_mtime = buf.st_mtime;
 
-							}
-						}
-					}
 				}
 			}
 		}
