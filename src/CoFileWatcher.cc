@@ -43,6 +43,7 @@
 #include <unistd.h>
 
 #include <qUtilities/QLetterCommands.h>
+#include <puTools/miStringFunctions.h>
 #include "CoFileWatcher.h"
 
 CoFileWatcher::CoFileWatcher(quint16 port, bool dm, string dir, bool vm, bool cp, string coserver_path, bool logPropFile,
@@ -54,9 +55,8 @@ CoFileWatcher::CoFileWatcher(quint16 port, bool dm, string dir, bool vm, bool cp
   watchMode = dm;
   //fileWatcher = NULL;
   threadPool.clear();
-  cout << dir << endl;
-  miutil::miString dirs(dir);
-  vector<miutil::miString> dirlist = dirs.split(",");
+  string dirs(dir);
+  vector<string> dirlist = miutil::split(dirs,",");
   for (int i = 0; i < dirlist.size(); i++)
   {
 	  CoFileWatcherThread * theThread = new CoFileWatcherThread();
