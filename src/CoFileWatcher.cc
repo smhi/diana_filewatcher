@@ -42,8 +42,14 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#define SMHI3
+
 #include <qUtilities/QLetterCommands.h>
+#ifndef SMHI3
 #include <puTools/miStringFunctions.h>
+#else
+#include <puTools/miString.h>
+#endif
 #include "CoFileWatcher.h"
 
 CoFileWatcher::CoFileWatcher(quint16 port, bool dm, string dir, bool vm, bool cp, string coserver_path, bool logPropFile,
@@ -55,8 +61,14 @@ CoFileWatcher::CoFileWatcher(quint16 port, bool dm, string dir, bool vm, bool cp
   watchMode = dm;
   //fileWatcher = NULL;
   threadPool.clear();
+  
+#ifndef SMHI3
   string dirs(dir);
   vector<string> dirlist = miutil::split(dirs,",");
+#else
+  miutil::miString dirs(dir);
+  vector<miutil::miString> dirlist = dirs.split(",");
+#endif
   for (int i = 0; i < dirlist.size(); i++)
   {
 	  CoFileWatcherThread * theThread = new CoFileWatcherThread();
