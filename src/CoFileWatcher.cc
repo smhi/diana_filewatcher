@@ -42,12 +42,12 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#define SMHI3
 
-#include <qUtilities/QLetterCommands.h>
-#ifndef SMHI3
+#ifdef COSERVER
+#include <coserver/QLetterCommands.h>
 #include <puTools/miStringFunctions.h>
 #else
+#include <qUtilities/QLetterCommands.h>
 #include <puTools/miString.h>
 #endif
 #include "CoFileWatcher.h"
@@ -62,7 +62,7 @@ CoFileWatcher::CoFileWatcher(quint16 port, bool dm, string dir, bool vm, bool cp
   //fileWatcher = NULL;
   threadPool.clear();
   
-#ifndef SMHI3
+#ifdef COSERVER
   string dirs(dir);
   vector<string> dirlist = miutil::split(dirs,",");
 #else

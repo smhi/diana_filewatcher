@@ -8,8 +8,16 @@
 #include <QApplication>
 #include <stdlib.h>
 #include <puTools/miCommandLine.h>
+#ifdef COSERVER
+#include <puTools/miStringFunctions.h>
+#include <coserver/QLetterCommands.h>
+#else
+#include <puTools/miString.h>
 #include <qUtilities/QLetterCommands.h>
+#endif
 #include "CoFileWatcher.h"
+
+using namespace std;
 
 #define _DEBUG
 
@@ -23,13 +31,13 @@ int main(int argc, char *argv[])
   cerr << "argc: " << argc << endl;
 
   for(int i=0;i<argc;i++) {
-    cerr << "argv: " << miutil::miString(argv[i]) << endl;
+    cerr << "argv: " << string(argv[i]) << endl;
   }
 #endif
 
   // parsing commandline-arguments
   vector<miCommandLine::option> opt(7);
-  miutil::miString logfile;
+  string logfile;
 
   opt[0].flag = 'd';
   opt[0].alias = "dynamic";
@@ -66,7 +74,11 @@ int main(int argc, char *argv[])
     //os >> port;
 
     if (cl.arg('p').size() >= 0) {
+#ifdef COSERVER
+	  port = miutil::to_int(cl.arg('p')[0]);
+#else
       port = miutil::miString(cl.arg('p')[0]).toInt(0);
+#endif
     } else {
 #ifdef _DEBUG
       cerr << "cl.arg('p').size() == 0" << cl.arg('p').size() << endl;
@@ -89,7 +101,7 @@ int main(int argc, char *argv[])
   } else {
     logfile = "";
   }
-  miutil::miString dir = "";
+  string dir = "";
   if (cl.hasFlag('w')) {
     if (cl.arg('w').size() > 0)
       dir = cl.arg('w')[0];
