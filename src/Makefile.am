@@ -34,6 +34,7 @@ filewatcher_LDADD = \
 	$(MILOGGER_LIBS)
 
 if WITH_COSERVER
+filewatcher_SOURCES += miCommandLineStd.cc
 filewatcher_CPPFLAGS += -DCOSERVER
 filewatcher_LDFLAGS += \
 	${COSERVER_LDFLAGS}

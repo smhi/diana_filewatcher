@@ -7,11 +7,13 @@
 // Qt-includes
 #include <QApplication>
 #include <stdlib.h>
-#include <puTools/miCommandLine.h>
+
 #ifdef COSERVER
+#include "miCommandLineStd.h"
 #include <puTools/miStringFunctions.h>
 #include <coserver/QLetterCommands.h>
 #else
+#include <puTools/miCommandLine.h>
 #include <puTools/miString.h>
 #include <qUtilities/QLetterCommands.h>
 #endif
@@ -36,7 +38,11 @@ int main(int argc, char *argv[])
 #endif
 
   // parsing commandline-arguments
+#ifdef COSERVER
+  vector<miCommandLineStd::option> opt(7);
+#else
   vector<miCommandLine::option> opt(7);
+#endif
   string logfile;
 
   opt[0].flag = 'd';
@@ -62,8 +68,11 @@ int main(int argc, char *argv[])
   opt[5].flag = 'c';
   opt[5].alias = "coserver-path";
   opt[5].hasArg = true;
-
+#ifdef COSERVER
+  miCommandLineStd cl(opt, argc, argv);
+#else
   miCommandLine cl(opt, argc, argv);
+#endif
 
   quint16 port;
   quint16 fileport;
