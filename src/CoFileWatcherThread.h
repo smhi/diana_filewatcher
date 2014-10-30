@@ -69,7 +69,7 @@ signals:
 
   // Qt take care of generating the implementation
   void directoryChanged ( const QString & path );
-  void fileChanged ( const QString & path );
+  void fileChanged ( const QString & path, const bool & start_up );
 
 
 };

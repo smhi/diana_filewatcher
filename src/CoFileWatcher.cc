@@ -61,7 +61,6 @@ QObject()
   watchMode = dm;
   indexMode = im;
   index_path_ = index_path;
-  start_up = true;
   //fileWatcher = NULL;
   threadPool.clear();
 
@@ -80,7 +79,7 @@ QObject()
       // Connect the threads with
       // this object
       connect( theThread, SIGNAL(directoryChanged(const QString&)), this, SLOT(directoryHasChanged(const QString&)));
-      connect( theThread, SIGNAL(fileChanged(const QString&)), this, SLOT(fileHasChanged(const QString&)));
+      connect( theThread, SIGNAL(fileChanged(const QString&, const bool&)), this, SLOT(fileHasChanged(const QString&, const bool&)));
       threadPool.push_back(theThread);
     }
   }
@@ -193,7 +192,7 @@ void CoFileWatcher::directoryHasChanged ( const QString & path )
   }
 }
 
-void CoFileWatcher::fileHasChanged ( const QString & path )
+void CoFileWatcher::fileHasChanged ( const QString & path, const bool & start_up )
 {
   if (visualMode)
     console->log(path.toStdString());
@@ -233,6 +232,5 @@ void CoFileWatcher::fileHasChanged ( const QString & path )
     }
     console->log(command);
     int result = system(command.c_str());
-    start_up = false;
   }
 }

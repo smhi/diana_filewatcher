@@ -77,7 +77,6 @@ private:
   bool watchMode;
 	bool indexMode;
   string index_path_;
-  bool start_up;
 
 public:
   /**
@@ -94,7 +93,7 @@ public:
 
 public slots:
   void directoryHasChanged ( const QString & path );
-  void fileHasChanged ( const QString & path );
+  void fileHasChanged ( const QString & path, const bool & start_up );
 
 };
 

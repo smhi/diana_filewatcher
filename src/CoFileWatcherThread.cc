@@ -99,7 +99,7 @@ void CoFileWatcherThread::run()
 	// The QDateTime specifier
 	QString datetimespec = "";
 
-
+  bool start_up = true;
 	while (!stop)
 	{
 		// we must ensure consistency of the object
@@ -227,7 +227,8 @@ void CoFileWatcherThread::run()
 						QString theFile = fileInfo.absoluteFilePath();
 						_watch_file = theFile;
 						// send file changed...
-						emit fileChanged(theFile);
+						emit fileChanged(theFile, start_up);
+            start_up = false;
 
 					}
 				}
@@ -241,7 +242,7 @@ void CoFileWatcherThread::run()
 						{
 							st_prev_wfile_mtime = buf.st_mtime;
 							QString theFile(_watch_file);
-							emit fileChanged(theFile);
+							emit fileChanged(theFile, start_up);
 						}
 					}
 
