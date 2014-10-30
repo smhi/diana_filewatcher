@@ -77,6 +77,7 @@ private:
   bool watchMode;
 	bool indexMode;
   string index_path_;
+  bool start_up;
 
 public:
   /**

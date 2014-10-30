@@ -61,6 +61,7 @@ QObject()
   watchMode = dm;
   indexMode = im;
   index_path_ = index_path;
+  start_up = true;
   //fileWatcher = NULL;
   threadPool.clear();
 
@@ -222,8 +223,16 @@ void CoFileWatcher::fileHasChanged ( const QString & path )
     }
     //create_index_and_contents_with_fimex.sh -d 'directory path' -m 'model name' -f 'file name'
     std::string model_name = part2.substr(0,part2.find_last_of("_"));
-    command += " -d " + part1 + " -m " + model_name + " -f " + path.toStdString() + " 2>&1 &";
+    if(start_up) {
+      // Check the whole directory
+      command += " -d " + part1 + " -m " + model_name + " 2>&1 &";
+    }
+    else {
+      // Check the current file
+      command += " -d " + part1 + " -m " + model_name + " -f " + path.toStdString() + " 2>&1 &";
+    }
     console->log(command);
     int result = system(command.c_str());
+    start_up = false;
   }
 }

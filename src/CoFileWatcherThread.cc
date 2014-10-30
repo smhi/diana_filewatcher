@@ -159,7 +159,7 @@ void CoFileWatcherThread::run()
         pattern = basename;
       }
       else{
-        basename + "." + suffix;
+        pattern = basename + "." + suffix;
       }
 			QString cwd = fi.absolutePath();
 			//cout << cwd.toStdString().c_str() << endl;
