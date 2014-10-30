@@ -40,6 +40,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <vector>
 #include <QDir>
 #include <QDateTime>
+#include <diField/TimeFilter.h>
+
 
 #include "CoFileWatcherThread.h"
 
@@ -118,27 +120,47 @@ void CoFileWatcherThread::run()
 		}
 		if (_file != "")
 		{
-			// split _files in dir and pattern part
-			if (_file.contains("[") && _file.contains("]"))
-			{
-				// filespec contains a QDataTime specifier...
-				// get it, and replace with '*'.
-				QString left("[");
-				QString right("]");
-				int start = _file.indexOf(left);
-				int stop = _file.indexOf(right);
-				int len = stop - start;
-				//cerr << _file.toStdString().c_str() << endl;
-				datetimespec = _file.mid(start + 1, len - 1);
-				//cerr << datetimespec.toStdString().c_str() << endl;
-				QString str_to_replace = "[" + datetimespec + "]";
-				_file.replace(str_to_replace, QString("*"));
-				//cerr << _file.toStdString().c_str() << endl;
-			}
+      // split _files in dir and pattern part
+      if (_file.contains("[") && _file.contains("]"))
+      {
+        // init time filter and replace yyyy etc. with ????
+        TimeFilter tf;
+        std::string sourcestr = _file.toStdString();
+        std::string part1, part2=sourcestr;
+        if(sourcestr.find("/") != sourcestr.npos) {
+          part1 = sourcestr.substr(0,sourcestr.find_last_of("/")+1);
+          part2 = sourcestr.substr(sourcestr.find_last_of("/")+1,sourcestr.size()-1);
+        }
+        tf.initFilter(part2,true);
+        sourcestr = part1 + part2;
+        _file = sourcestr.c_str();
+      }
+			
+			//	// filespec contains a QDataTime specifier...
+			//	// get it, and replace with '*'.
+			//	QString left("[");
+			//	QString right("]");
+			//	int start = _file.indexOf(left);
+			//	int stop = _file.indexOf(right);
+			//	int len = stop - start;
+			//	//cerr << _file.toStdString().c_str() << endl;
+			//	datetimespec = _file.mid(start + 1, len - 1);
+			//	//cerr << datetimespec.toStdString().c_str() << endl;
+			//	QString str_to_replace = "[" + datetimespec + "]";
+			//	_file.replace(str_to_replace, QString("*"));
+			//	//cerr << _file.toStdString().c_str() << endl;
+			//}
 			QFileInfo fi(_file);
 			QString basename = fi.completeBaseName();
 			QString suffix = fi.completeSuffix();
-			QString pattern = basename + "." + suffix;
+      // we must check i suffix is empty...
+      QString pattern;
+      if (suffix.length() == 0) {
+        pattern = basename;
+      }
+      else{
+        basename + "." + suffix;
+      }
 			QString cwd = fi.absolutePath();
 			//cout << cwd.toStdString().c_str() << endl;
 			if(!stat(cwd.toStdString().c_str(), &buf))
@@ -204,7 +226,6 @@ void CoFileWatcherThread::run()
 						QFileInfo fileInfo = list.at(index);
 						QString theFile = fileInfo.absoluteFilePath();
 						_watch_file = theFile;
-						//cout << _watch_file.toStdString().c_str() << endl;
 						// send file changed...
 						emit fileChanged(theFile);
 

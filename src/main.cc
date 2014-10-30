@@ -68,6 +68,11 @@ int main(int argc, char *argv[])
   opt[5].flag = 'c';
   opt[5].alias = "coserver-path";
   opt[5].hasArg = true;
+
+	opt[6].flag = 'i';
+  opt[6].alias = "index-path";
+  opt[6].hasArg = true;
+
 #ifdef COSERVER
   miCommandLineStd cl(opt, argc, argv);
 #else
@@ -78,7 +83,9 @@ int main(int argc, char *argv[])
   quint16 fileport;
 
   if (cl.hasFlag('p')) {
+#ifdef _DEBUG
     cerr << "P flag sent" << endl;
+#endif
     //istringstream os((cl.arg('p'))[0]);
     //os >> port;
 
@@ -133,16 +140,27 @@ int main(int argc, char *argv[])
       coserver_path = cl.arg('c')[0];
   }
 
+	string index_path = "";
+
+  if (cl.hasFlag('i')) {
+    if(cl.arg('i').size() > 0)
+      index_path = cl.arg('i')[0];
+  }
+
   QCoreApplication* app;
   if (cl.hasFlag('v')) {
+#ifdef _DEBUG
     cerr << "Visible" << endl;
+#endif
     app = new QApplication(argc, argv);
   } else {
+#ifdef _DEBUG
     cerr << "Console" << endl;
+#endif
     app = new QCoreApplication(argc, argv);
   }
 
-  CoFileWatcher watcher(port, cl.hasFlag('w'), dir, cl.hasFlag('v'), cl.hasFlag('c'), coserver_path, cl.hasFlag('L'), logPropFilename);
+  CoFileWatcher watcher(port, cl.hasFlag('w'), dir, cl.hasFlag('v'), cl.hasFlag('c'), coserver_path, index_path, cl.hasFlag('i'), cl.hasFlag('L'), logPropFilename);
   /*
   if (!server->ready())
     exit(1);

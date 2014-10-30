@@ -75,6 +75,8 @@ private:
   int id;
   bool visualMode;
   bool watchMode;
+	bool indexMode;
+  string index_path_;
 
 public:
   /**
@@ -85,7 +87,7 @@ public:
    * @param logPropFile When given, log4cxx will use logPropFilename as properties file
    * @param logPropFilename The log4cxx properties file
    */
-  CoFileWatcher(quint16 port, bool dm, string dir, bool vm, bool cp, string coserver_path, bool logPropFile = false,
+  CoFileWatcher(quint16 port, bool dm, string dir, bool vm, bool cp, string coserver_path, string index_path, bool im, bool logPropFile = false,
       string logPropFilename = "");
   ~CoFileWatcher();
 
