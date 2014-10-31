@@ -43,6 +43,10 @@ filewatcher_LDFLAGS += \
 	${COSERVER_LDFLAGS}
 filewatcher_LDADD += \
 	${COSERVER_LIBS}
+else
+# the old diField implementation has not -fopenmp in flags
+filewatcher_CPPFLAGS += -fopenmp
+filewatcher_LDFLAGS += -fopenmp
 endif
 
 
