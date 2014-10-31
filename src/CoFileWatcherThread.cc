@@ -96,6 +96,8 @@ void CoFileWatcherThread::run()
 	time_t st_prev_file_mtime = 0;
 	// init the watch_files time
 	time_t st_prev_wfile_mtime = 0;
+  // time last accesed
+  time_t time_last_accessed = 0;
 	// The QDateTime specifier
 	QString datetimespec = "";
 
@@ -222,12 +224,15 @@ void CoFileWatcherThread::run()
 							}
 						}
 						// This will point to the youngest file
+            if (time(NULL) - time_last_accessed > 3600)
+                start_up = true;
 						st_prev_wfile_mtime = prev_mtime;
 						QFileInfo fileInfo = list.at(index);
 						QString theFile = fileInfo.absoluteFilePath();
 						_watch_file = theFile;
 						// send file changed...
 						emit fileChanged(theFile, start_up);
+            time_last_accessed = st_prev_wfile_mtime;
             start_up = false;
 
 					}
@@ -240,9 +245,13 @@ void CoFileWatcherThread::run()
 						// > to deal with start up
 						if (buf.st_mtime > st_prev_wfile_mtime)
 						{
-							st_prev_wfile_mtime = buf.st_mtime;
+							if (time(NULL) - time_last_accessed > 3600)
+                start_up = true;
+              st_prev_wfile_mtime = buf.st_mtime;
 							QString theFile(_watch_file);
 							emit fileChanged(theFile, start_up);
+              time_last_accessed = st_prev_wfile_mtime;
+              start_up = false;
 						}
 					}
 
