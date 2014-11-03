@@ -102,7 +102,7 @@ QObject()
 
   logger = log4cxx::Logger::getLogger("coserver4.CoServer4");
 #endif
-  cout << coserver_path.c_str() << endl;
+  cerr << coserver_path.c_str() << endl;
 
   coclient = new CoClient("filewatcher", "localhost", coserver_path.c_str());
   coclient->setBroadcastClient();
@@ -118,7 +118,7 @@ QObject()
   if (watchMode) {
     //cout << "Watch: " << dir << endl;
 #ifdef _DEBUG
-    cout << "Started watch mode: " << dir << endl;
+    cerr << "Started watch mode: " << dir.c_str() << endl;
 #endif
     // Unfortunately, this don't work with the current NFS implementation in linux.
     /*
@@ -178,8 +178,8 @@ void CoFileWatcher::directoryHasChanged ( const QString & path )
     console->log(path.toStdString());
   else
   {
-    cout << string(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss").toStdString()+"\n").c_str();
-    cout << string(path.toStdString() + "\n").c_str();
+    cerr << string(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss").toStdString()+"\n").c_str();
+    cerr << string(path.toStdString() + "\n").c_str();
   }
   if (!indexMode)
   {
@@ -197,8 +197,8 @@ void CoFileWatcher::fileHasChanged ( const QString & path, const bool & start_up
   if (visualMode)
     console->log(path.toStdString());
   else {
-    cout << string(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss").toStdString()+"\n").c_str();
-    cout << string(path.toStdString() + "\n").c_str();
+    cerr << string(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss").toStdString()+"\n").c_str();
+    cerr << string(path.toStdString() + "\n").c_str();
   }
   if(!indexMode)
   {
@@ -230,7 +230,8 @@ void CoFileWatcher::fileHasChanged ( const QString & path, const bool & start_up
       // Check the current file
       command += " " + part1 + " " + model_name + " " + path.toStdString() + " 2>&1 &";
     }
-    console->log(command);
+    if (visualMode)
+      console->log(command);
     int result = system(command.c_str());
   }
 }
