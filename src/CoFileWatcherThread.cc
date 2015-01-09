@@ -38,6 +38,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <sys/stat.h>
 #include <unistd.h>
 #include <vector>
+#include <map>
 #include <QDir>
 #include <QDateTime>
 #include <diField/TimeFilter.h>
@@ -96,10 +97,12 @@ void CoFileWatcherThread::run()
 	time_t st_prev_file_mtime = 0;
 	// init the watch_files time
 	time_t st_prev_wfile_mtime = 0;
-  // time last accesed
-  time_t time_last_accessed = 0;
+    // time last accesed
+    time_t time_last_accessed = 0;
 	// The QDateTime specifier
 	QString datetimespec = "";
+	
+	std::map<QString,QFileInfo> prevDirList;
 
   bool start_up = true;
 	while (!stop)
@@ -184,6 +187,7 @@ void CoFileWatcherThread::run()
 					d.cd(cwd);
 					QStringList patterns(pattern);
 					QFileInfoList list = d.entryInfoList(patterns);
+					std::map<QString,QFileInfo> dirList;
 					// directory not empty
 					if (list.size() > 0)
 					{
@@ -200,40 +204,37 @@ void CoFileWatcherThread::run()
 						{
 							QFileInfo fileInfo = list.at(k);
 							QString theFile = fileInfo.absoluteFilePath();
-							// Get the timestamp from filename, if present
-							if (datetimespec != "")
-							{
-								// Will always work, I think.
-								QString date_time = fileInfo.baseName();
-								//cout << date_time.toStdString().c_str() << endl; 
-								qtimestamp = QDateTime::fromString(date_time, datetimespec);
-								//cout << qtimestamp.toString().toStdString().c_str() << endl;
-								mtime = qtimestamp.toTime_t();
-							}
-							else
-							{
+							// Insert in to map...
+							dirList[theFile] = fileInfo;
+						}
+						// Iterate through the map and compare with prev map...
+						// File not present in the prev map is new..
+						std::map<QString,QFileInfo>::iterator diter = dirList.begin();
+						for (; diter != dirList.end(); diter++) {
+							// New file found
+							if (prevDirList.count(diter->first) == 0) {
 								// More general, but perhaps not working
-								qmtime = fileInfo.created();
+								qmtime = diter->second.created();
 								mtime = qmtime.toTime_t();
-							}
-							// Check for youngest file
-							if (mtime > prev_mtime)
-							{
-								prev_mtime = mtime;
-								index = k;
+								// Check for youngest file
+								if (mtime > prev_mtime)
+								{
+									prev_mtime = mtime;
+									st_prev_wfile_mtime = prev_mtime;
+									_watch_file = diter->first;
+								}
+								if (time(NULL) - time_last_accessed > 3600) {
+									start_up = true;
+									time_last_accessed = time(NULL);
+								}
+
+								// send file changed...
+								emit fileChanged(diter->first, start_up);
+								start_up = false;
+								
 							}
 						}
-						// This will point to the youngest file
-            if (time(NULL) - time_last_accessed > 3600)
-                start_up = true;
-						st_prev_wfile_mtime = prev_mtime;
-						QFileInfo fileInfo = list.at(index);
-						QString theFile = fileInfo.absoluteFilePath();
-						_watch_file = theFile;
-						// send file changed...
-						emit fileChanged(theFile, start_up);
-            time_last_accessed = st_prev_wfile_mtime;
-            start_up = false;
+						prevDirList = dirList;
 
 					}
 				}
@@ -245,13 +246,14 @@ void CoFileWatcherThread::run()
 						// > to deal with start up
 						if (buf.st_mtime > st_prev_wfile_mtime)
 						{
-							if (time(NULL) - time_last_accessed > 3600)
-                start_up = true;
-              st_prev_wfile_mtime = buf.st_mtime;
+							if (time(NULL) - time_last_accessed > 3600) {
+								start_up = true;
+								time_last_accessed = time(NULL);
+							}
+							st_prev_wfile_mtime = buf.st_mtime;
 							QString theFile(_watch_file);
 							emit fileChanged(theFile, start_up);
-              time_last_accessed = st_prev_wfile_mtime;
-              start_up = false;
+							start_up = false;
 						}
 					}
 
