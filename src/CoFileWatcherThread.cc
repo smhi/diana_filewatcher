@@ -166,6 +166,7 @@ void CoFileWatcherThread::run()
       else{
         pattern = basename + "." + suffix;
       }
+	  //cout << "pattern: " << pattern.toStdString() << endl;
 			QString cwd = fi.absolutePath();
 			//cout << cwd.toStdString().c_str() << endl;
 			if(!stat(cwd.toStdString().c_str(), &buf))
