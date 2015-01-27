@@ -68,6 +68,12 @@ void CoFileWatcherThread::addPath ( const QString & path )
 		_directory = path;
 }
 
+void CoFileWatcherThread::setDaysBack( int days_back )
+{
+	QMutexLocker l(&jobMutex);
+	_days_back = days_back;
+}
+
 QString CoFileWatcherThread::directory ()
 {
 	QMutexLocker l(&jobMutex);
@@ -103,12 +109,16 @@ void CoFileWatcherThread::run()
 	QString datetimespec = "";
 	
 	std::map<QString,QFileInfo> prevDirList;
+	
+	int seconds_back = _days_back*24*3600;
 
   bool start_up = true;
 	while (!stop)
 	{
 		// we must ensure consistency of the object
 		QMutexLocker l(&jobMutex);
+		
+		time_t time_now = time(NULL);
 
 		if (_directory != "")
 		{
@@ -201,6 +211,7 @@ void CoFileWatcherThread::run()
 						int index = 0;
 						QDateTime qtimestamp;
 						QDateTime qmtime;
+						
 						for (int k = 0; k < list.size(); k++)
 						{
 							QFileInfo fileInfo = list.at(k);
@@ -224,13 +235,25 @@ void CoFileWatcherThread::run()
 									st_prev_wfile_mtime = prev_mtime;
 									_watch_file = diter->first;
 								}
-								if (time(NULL) - time_last_accessed > 3600) {
+								if (time_now - time_last_accessed > 3600) {
 									start_up = true;
-									time_last_accessed = time(NULL);
+									time_last_accessed = time_now;
 								}
 
 								// send file changed...
-								emit fileChanged(diter->first, start_up);
+								// limit with seconds_back.
+								if (seconds_back > 0)
+								{
+									if (time_now - mtime <= seconds_back)
+									{
+										emit fileChanged(diter->first, start_up);
+									}
+										
+								}
+								else
+								{
+									emit fileChanged(diter->first, start_up);
+								}
 								start_up = false;
 								
 							}
@@ -247,9 +270,9 @@ void CoFileWatcherThread::run()
 						// > to deal with start up
 						if (buf.st_mtime > st_prev_wfile_mtime)
 						{
-							if (time(NULL) - time_last_accessed > 3600) {
+							if (time_now - time_last_accessed > 3600) {
 								start_up = true;
-								time_last_accessed = time(NULL);
+								time_last_accessed = time_now;
 							}
 							st_prev_wfile_mtime = buf.st_mtime;
 							QString theFile(_watch_file);

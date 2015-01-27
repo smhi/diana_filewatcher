@@ -87,7 +87,7 @@ public:
    * @param logPropFile When given, log4cxx will use logPropFilename as properties file
    * @param logPropFilename The log4cxx properties file
    */
-  CoFileWatcher(quint16 port, bool dm, string dir, bool vm, bool cp, string coserver_path, string index_path, bool im, bool logPropFile = false,
+  CoFileWatcher(quint16 port, bool dm, string dir, bool vm, bool cp, string coserver_path, string index_path, bool im, int days_back, bool logPropFile = false,
       string logPropFilename = "");
   ~CoFileWatcher();
 

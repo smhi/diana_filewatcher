@@ -52,7 +52,7 @@
 #endif
 #include "CoFileWatcher.h"
 
-CoFileWatcher::CoFileWatcher(quint16 port, bool dm, string dir, bool vm, bool cp, string coserver_path, string index_path, bool im, bool logPropFile,
+CoFileWatcher::CoFileWatcher(quint16 port, bool dm, string dir, bool vm, bool cp, string coserver_path, string index_path, bool im, int days_back, bool logPropFile,
                              string logPropFilename) :
 QObject()
 {
@@ -140,6 +140,7 @@ QObject()
       QString theDir((const char *)dirlist[i].c_str());
       CoFileWatcherThread * theThread = threadPool[i];
       theThread->addPath(theDir);
+	  theThread->setDaysBack(days_back);
       theThread->start();
     }
 

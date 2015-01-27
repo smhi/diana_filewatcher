@@ -56,13 +56,17 @@ private:
   QString _directory;
   QString _file;
   QString _watch_file;
+  int _days_back;
+  
 
 public:
   bool stop;
+  
   CoFileWatcherThread();
   ~CoFileWatcherThread();
   void run();
   void addPath ( const QString & path );
+  void setDaysBack( int days_back );
   QString directory ();
   QString file ();
 signals:

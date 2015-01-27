@@ -39,9 +39,9 @@ int main(int argc, char *argv[])
 
   // parsing commandline-arguments
 #ifdef COSERVER
-  vector<miCommandLineStd::option> opt(7);
+  vector<miCommandLineStd::option> opt(8);
 #else
-  vector<miCommandLine::option> opt(7);
+  vector<miCommandLine::option> opt(8);
 #endif
   string logfile;
 
@@ -69,9 +69,13 @@ int main(int argc, char *argv[])
   opt[5].alias = "coserver-path";
   opt[5].hasArg = true;
 
-	opt[6].flag = 'i';
+  opt[6].flag = 'i';
   opt[6].alias = "index-path";
   opt[6].hasArg = true;
+  
+  opt[7].flag = 'b';
+  opt[7].alias = "days-back";
+  opt[7].hasArg = true;
 
 #ifdef COSERVER
   miCommandLineStd cl(opt, argc, argv);
@@ -140,11 +144,20 @@ int main(int argc, char *argv[])
       coserver_path = cl.arg('c')[0];
   }
 
-	string index_path = "";
+  string index_path = "";
 
   if (cl.hasFlag('i')) {
     if(cl.arg('i').size() > 0)
       index_path = cl.arg('i')[0];
+  }
+  
+  int days_back = -1;
+
+  if (cl.hasFlag('b')) {
+    if(cl.arg('b').size() > 0) {
+      string sdays_back = cl.arg('b')[0];
+	  days_back = atoi(sdays_back.c_str());
+	}
   }
 
   QCoreApplication* app;
@@ -160,7 +173,7 @@ int main(int argc, char *argv[])
     app = new QCoreApplication(argc, argv);
   }
 
-  CoFileWatcher watcher(port, cl.hasFlag('w'), dir, cl.hasFlag('v'), cl.hasFlag('c'), coserver_path, index_path, cl.hasFlag('i'), cl.hasFlag('L'), logPropFilename);
+  CoFileWatcher watcher(port, cl.hasFlag('w'), dir, cl.hasFlag('v'), cl.hasFlag('c'), coserver_path, index_path, cl.hasFlag('i'), days_back, cl.hasFlag('L'), logPropFilename);
   /*
   if (!server->ready())
     exit(1);
