@@ -225,7 +225,7 @@ void CoFileWatcher::fileHasChanged ( const QString & path, const bool & start_up
     std::string model_name = part2.substr(0,part2.find_last_of("_"));
     if(start_up) {
       // Check the whole directory
-      command += " " + part1 + " " + model_name + " 2>&1";
+      command += " " + part1 + " " + model_name + " " + path.toStdString() + " clean" + " 2>&1";
     }
     else {
       // Check the current file
