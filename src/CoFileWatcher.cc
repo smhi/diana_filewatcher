@@ -103,10 +103,15 @@ QObject()
   logger = log4cxx::Logger::getLogger("coserver4.CoServer4");
 #endif
   cerr << coserver_path.c_str() << endl;
-
-  coclient = new CoClient("filewatcher", "localhost", coserver_path.c_str());
-  coclient->setBroadcastClient();
-  coclient->connectToServer();
+  if (!indexMode)
+  {
+    coclient = new CoClient("filewatcher", "localhost", coserver_path.c_str());
+    coclient->setBroadcastClient();
+    coclient->connectToServer();
+  } else {
+    coclient=NULL;
+  }
+  
 
   if (visualMode) {
 #ifdef _DEBUG
@@ -140,7 +145,7 @@ QObject()
       QString theDir((const char *)dirlist[i].c_str());
       CoFileWatcherThread * theThread = threadPool[i];
       theThread->addPath(theDir);
-	  theThread->setDaysBack(days_back);
+      theThread->setDaysBack(days_back);
       theThread->start();
     }
 
@@ -148,11 +153,13 @@ QObject()
   } // end watch mode
 
 #ifdef HAVE_LOG4CXX
+if (!indexMode) {
   if (isListening()) {
     LOG4CXX_INFO(logger, "coserver4 listening on port " << port);
   } else {
     LOG4CXX_ERROR(logger, "Failed to bind to port");
   }
+}
 #endif
 
 }
