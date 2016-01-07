@@ -105,7 +105,9 @@ QObject()
   cerr << coserver_path.c_str() << endl;
   if (!indexMode)
   {
-    coclient = new CoClient("filewatcher", "localhost", coserver_path.c_str());
+    //coclient = new CoClient("filewatcher", "localhost", coserver_path.c_str());
+    coclient = new CoClient("filewatcher", "localhost");
+    coclient->setServerCommand(QString::fromStdString(coserver_path));
     coclient->setBroadcastClient();
     coclient->connectToServer();
   } else {
