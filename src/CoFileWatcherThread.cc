@@ -41,7 +41,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <map>
 #include <QDir>
 #include <QDateTime>
-#include <diField/TimeFilter.h>
+#include <puTools/TimeFilter.h>
 
 
 #include "CoFileWatcherThread.h"
@@ -139,7 +139,7 @@ void CoFileWatcherThread::run()
       if (_file.contains("[") && _file.contains("]"))
       {
         // init time filter and replace yyyy etc. with ????
-        TimeFilter tf;
+        miutil::TimeFilter tf;
         std::string sourcestr = _file.toStdString();
         std::string part1, part2=sourcestr;
         if(sourcestr.find("/") != sourcestr.npos) {

@@ -43,13 +43,8 @@
 #include <unistd.h>
 
 
-#ifdef COSERVER
 #include <coserver/QLetterCommands.h>
 #include <puTools/miStringFunctions.h>
-#else
-#include <qUtilities/QLetterCommands.h>
-#include <puTools/miString.h>
-#endif
 #include "CoFileWatcher.h"
 
 CoFileWatcher::CoFileWatcher(quint16 port, bool dm, string dir, bool vm, bool cp, string coserver_path, string index_path, bool im, int days_back, bool logPropFile,
@@ -64,13 +59,9 @@ QObject()
   //fileWatcher = NULL;
   threadPool.clear();
 
-#ifdef COSERVER
   string dirs(dir);
   vector<string> dirlist = miutil::split(dirs,",");
-#else
-  miutil::miString dirs(dir);
-  vector<miutil::miString> dirlist = dirs.split(",");
-#endif
+
   for (int i = 0; i < dirlist.size(); i++)
   {
     CoFileWatcherThread * theThread = new CoFileWatcherThread();

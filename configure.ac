@@ -7,11 +7,10 @@ AC_PREREQ(2.59)
 #-----------------------------------------------------------------------------
 # Programs
 #-----------------------------------------------------------------------------
-AC_INIT(src/main.cc)
+AC_INIT([filewatcher], [1.1.0])
 AC_CONFIG_MACRO_DIR([m4])
 
-AM_INIT_AUTOMAKE(filewatcher, 1.0.1)
-AC_CONFIG_HEADER([config.h])
+AM_INIT_AUTOMAKE([1.11 foreign parallel-tests])
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -39,20 +38,10 @@ METNO_REQUIRE_QT4([
 	Gui
 	Network
  ])
-METNO_REQUIRE_PKG([MILOGGER], [miLogger])
-METNO_REQUIRE_PKG([PUTOOLS], [puTools])
-METNO_REQUIRE_PKG([QUTILITIES], [qUtilities])
-METNO_REQUIRE_PKG([DIFIELD], [diField])
-
-#
-# Features
-#
-METNO_WITH_LIBRARY([COSERVER], [coserver], [coserver library], [no])
-METNO_IF_WITH([coserver],  
-[
-   METNO_REQUIRE_PKG([COSERVER], [coserver])
-])
-METNO_WITH_CONDITIONAL([COSERVER], [coserver])
+METNO_REQUIRE_PKG([MILOGGER], [miLogger], [5.0.3])
+METNO_REQUIRE_PKG([PUTOOLS], [puTools], [5.1.4])
+METNO_REQUIRE_PKG([QUTILITIES], [qUtilities], [5.1.4])
+METNO_REQUIRE_PKG([COSERVER], [coserver], [2.0.4])
 
 
 

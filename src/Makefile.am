@@ -21,33 +21,24 @@ filewatcher_CXXFLAGS = \
 	$(QT4_CPPFLAGS) \
 	$(QUTILITIES_CPPFLAGS) \
 	$(PUTOOLS_CPPFLAGS) \
-	$(MILOGGER_CPPFLAGS) \
-	$(DIFIELD_CPPFLAGS)
+	$(MILOGGER_CPPFLAGS)
 filewatcher_LDFLAGS = \
 	$(QT4_LDFLAGS) \
 	$(QUTILITIES_LDFLAGS) \
 	$(PUTOOLS_LDFLAGS) \
-	$(MILOGGER_LDFLAGS) \
-	$(DIFIELD_LDFLAGS)
+	$(MILOGGER_LDFLAGS)
 filewatcher_LDADD = \
 	$(QT4_LIBS) \
 	$(QUTILITIES_LIBS) \
 	$(PUTOOLS_LIBS) \
-	$(MILOGGER_LIBS) \
-	$(DIFIELD_LIBS)
+	$(MILOGGER_LIBS)
 
-if WITH_COSERVER
-filewatcher_SOURCES += miCommandLineStd.cc
-filewatcher_CPPFLAGS += -DCOSERVER
+filewatcher_CPPFLAGS += \
+  ${COSERVER_CPPFLAGS}
 filewatcher_LDFLAGS += \
 	${COSERVER_LDFLAGS}
 filewatcher_LDADD += \
 	${COSERVER_LIBS}
-else
-# the old diField implementation has not -fopenmp in flags
-filewatcher_CPPFLAGS += -fopenmp
-filewatcher_LDFLAGS += -fopenmp
-endif
 
 
 # This lets GNU make create any moc_*.cpp from the equivalent *.h

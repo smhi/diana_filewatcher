@@ -8,15 +8,10 @@
 #include <QApplication>
 #include <stdlib.h>
 
-#ifdef COSERVER
-#include "miCommandLineStd.h"
+#include <puTools/miCommandLine.h>
 #include <puTools/miStringFunctions.h>
 #include <coserver/QLetterCommands.h>
-#else
-#include <puTools/miCommandLine.h>
-#include <puTools/miString.h>
-#include <qUtilities/QLetterCommands.h>
-#endif
+#include <cstdlib>
 #include "CoFileWatcher.h"
 
 using namespace std;
@@ -38,11 +33,7 @@ int main(int argc, char *argv[])
 #endif
 
   // parsing commandline-arguments
-#ifdef COSERVER
-  vector<miCommandLineStd::option> opt(8);
-#else
   vector<miCommandLine::option> opt(8);
-#endif
   string logfile;
 
   opt[0].flag = 'd';
@@ -77,11 +68,7 @@ int main(int argc, char *argv[])
   opt[7].alias = "days-back";
   opt[7].hasArg = true;
 
-#ifdef COSERVER
-  miCommandLineStd cl(opt, argc, argv);
-#else
   miCommandLine cl(opt, argc, argv);
-#endif
 
   quint16 port;
   quint16 fileport;
@@ -94,11 +81,7 @@ int main(int argc, char *argv[])
     //os >> port;
 
     if (cl.arg('p').size() >= 0) {
-#ifdef COSERVER
-	  port = miutil::to_int(cl.arg('p')[0]);
-#else
-      port = miutil::miString(cl.arg('p')[0]).toInt(0);
-#endif
+      port = miutil::to_int(cl.arg('p')[0]);
     } else {
 #ifdef _DEBUG
       cerr << "cl.arg('p').size() == 0" << cl.arg('p').size() << endl;
