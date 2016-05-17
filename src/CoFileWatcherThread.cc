@@ -146,7 +146,7 @@ void CoFileWatcherThread::run()
           part1 = sourcestr.substr(0,sourcestr.find_last_of("/")+1);
           part2 = sourcestr.substr(sourcestr.find_last_of("/")+1,sourcestr.size()-1);
         }
-        tf.initFilter(part2,true);
+        tf.initFilter(part2);
         sourcestr = part1 + part2;
         _file = sourcestr.c_str();
       }
