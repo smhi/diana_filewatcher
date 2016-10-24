@@ -22,7 +22,14 @@ NOTE the format *.lp2. The allowed format is the same as glob or QDir can handle
 
 Requirements
 ============
-Qt 4.2 or later. Thread support in Qt
+Qt 4.8 or later. Thread support in Qt.
+miLogger,puTools,qUtilities and coserver.
+https://github.com/metno/metlibs-milogger
+https://github.com/metno/metlibs-putools
+https://github.com/metno/metlibs-qutilities
+https://github.com/metno/metlibs-coserver
+
+
 
 License
 =======
